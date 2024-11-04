@@ -1,21 +1,27 @@
 const { Builder, By, until } = require('selenium-webdriver');
+const assert = require('assert');
 
-async function testLoginValid() {
-    let driver = await new Builder().forBrowser('chrome').build();
-    try {
+describe('Testes do Sistema Web', function() {
+    this.timeout(30000); // Configura o tempo limite para 30 segundos
+
+    let driver;
+    beforeEach(async () => {
+        driver = await new Builder().forBrowser('chrome').build();
+    });
+
+    afterEach(async () => {
+        await driver.quit();
+    });
+
+    it('Deve fazer login com credenciais válidas', async () => {
         await driver.get('http://localhost:3000/index.html');
-        
         await driver.findElement(By.id('username')).sendKeys('usuario');
         await driver.findElement(By.id('password')).sendKeys('1234');
         await driver.findElement(By.tagName('button')).click();
-
-        // Verifique se o redirecionamento para a página inicial ocorreu
         await driver.wait(until.urlContains('home.html'), 5000);
         let currentUrl = await driver.getCurrentUrl();
-        console.log(currentUrl.includes('home.html') ? 'Teste de Login com sucesso' : 'Falha no teste de Login');
-    } finally {
-        await driver.quit();
-    }
-}
+        assert.ok(currentUrl.includes('home.html'), 'Falha no login');
+    });
 
-testLoginValid();
+    // Adicione os demais testes aqui, usando a mesma estrutura `it`
+});
